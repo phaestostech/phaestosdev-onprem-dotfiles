@@ -1,0 +1,16 @@
+#!/bin/bash
+# Upload SSH key to GitHub and create allowed_signers file
+
+# Create allowed_signers for git commit verification
+if [ -f "$HOME/.ssh/id_ed25519.pub" ]; then
+  echo "{{ .email }} $(cat $HOME/.ssh/id_ed25519.pub)" > "$HOME/.ssh/allowed_signers"
+
+  # Upload to GitHub if gh is available and key not already uploaded
+  if command -v gh &> /dev/null; then
+    KEY_CONTENT=$(cat "$HOME/.ssh/id_ed25519.pub")
+    EXISTING=$(gh ssh-key list 2>/dev/null | grep -c "$(hostname)" || true)
+    if [ "$EXISTING" = "0" ]; then
+      gh ssh-key add "$HOME/.ssh/id_ed25519.pub" --title "$(hostname)" 2>/dev/null || true
+    fi
+  fi
+fi

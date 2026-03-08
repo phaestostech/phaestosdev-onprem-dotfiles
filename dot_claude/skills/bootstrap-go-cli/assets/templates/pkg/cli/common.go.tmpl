@@ -1,0 +1,14 @@
+package cli
+
+import (
+	"io"
+	"os"
+
+	"github.com/gookit/color"
+)
+
+var out io.Writer = os.Stdout
+
+func init() {
+	color.SetOutput(out)
+}

@@ -1,0 +1,24 @@
+#!/bin/bash
+# Clone standard repos
+
+mkdir -p "$HOME/phaestostech"
+
+{{ if not .isServer -}}
+# Personal repos
+for repo in companion crush; do
+  if [ ! -d "$HOME/codeninja55/$repo" ]; then
+    mkdir -p "$HOME/codeninja55"
+    gh repo clone "codeninja55/$repo" "$HOME/codeninja55/$repo" 2>/dev/null || true
+  fi
+done
+{{ end -}}
+
+# Shared repos
+if [ ! -d "$HOME/phaestostech/conflux" ]; then
+  gh repo clone "phaestostech/conflux" "$HOME/phaestostech/conflux" 2>/dev/null || true
+fi
+
+{{ if .isWork -}}
+mkdir -p "$HOME/harrison-ai"
+mkdir -p "$HOME/annaliseai"
+{{ end -}}

@@ -1,0 +1,26 @@
+README.md
+LICENSE
+docs/
+
+# Auto-managed auth files
+.claude/.credentials.json
+.codex/auth.json
+.codex/state_5.sqlite
+.codex/state_5.sqlite*
+.codex/models_cache.json
+.codex/log/
+.codex/tmp/
+.codex/shell_snapshots/
+
+# oh-my-zsh managed by .chezmoiexternal.toml
+.oh-my-zsh
+
+# OS-specific ignores
+{{ if ne .chezmoi.os "darwin" }}
+.Brewfile
+{{ end }}
+
+# Server-specific ignores
+{{ if .isServer }}
+.config/obsidian/
+{{ end }}

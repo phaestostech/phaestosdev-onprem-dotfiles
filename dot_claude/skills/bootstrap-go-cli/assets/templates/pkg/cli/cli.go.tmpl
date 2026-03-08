@@ -1,0 +1,65 @@
+package cli
+
+import (
+	"github.com/charmbracelet/huh"
+	"github.com/charmbracelet/lipgloss"
+	"github.com/gookit/color"
+)
+
+var (
+	DarkColour      = color.Hex("#546d79")
+	PrimaryColour   = color.Hex("#0972f1")
+	SecondaryColour = color.Hex("#70d4fc")
+	TertiaryColour  = color.Hex("#000f5b")
+	SuccessColour   = color.Hex("#69efad")
+	WarnColour      = color.Hex("#fffc7a")
+	ErrorColour     = color.Hex("#fe5151")
+)
+
+// ThemeDefault returns a custom theme based on the color scheme
+func ThemeDefault() *huh.Theme {
+	t := huh.ThemeBase()
+
+	var (
+		background = lipgloss.AdaptiveColor{Dark: "#282a36"}
+		foreground = lipgloss.AdaptiveColor{Dark: "#f8f8f2"}
+
+		primaryColour   = lipgloss.Color("#" + PrimaryColour.Hex())
+		secondaryColour = lipgloss.Color("#" + SecondaryColour.Hex())
+		tertiaryColour  = lipgloss.Color("#" + TertiaryColour.Hex())
+		successColour   = lipgloss.Color("#" + SuccessColour.Hex())
+		warnColour      = lipgloss.Color("#" + WarnColour.Hex())
+		errorColour     = lipgloss.Color("#" + ErrorColour.Hex())
+	)
+
+	t.Focused.Base = t.Focused.Base.BorderForeground(tertiaryColour)
+	t.Focused.Title = t.Focused.Title.Foreground(secondaryColour)
+	t.Focused.NoteTitle = t.Focused.NoteTitle.Foreground(tertiaryColour)
+	t.Focused.Description = t.Focused.Description.Foreground(primaryColour)
+	t.Focused.ErrorIndicator = t.Focused.ErrorIndicator.Foreground(errorColour)
+	t.Focused.Directory = t.Focused.Directory.Foreground(primaryColour)
+	t.Focused.File = t.Focused.File.Foreground(foreground)
+	t.Focused.ErrorMessage = t.Focused.ErrorMessage.Foreground(errorColour)
+	t.Focused.SelectSelector = t.Focused.SelectSelector.Foreground(warnColour)
+	t.Focused.NextIndicator = t.Focused.NextIndicator.Foreground(warnColour)
+	t.Focused.PrevIndicator = t.Focused.PrevIndicator.Foreground(warnColour)
+	t.Focused.Option = t.Focused.Option.Foreground(foreground)
+	t.Focused.MultiSelectSelector = t.Focused.MultiSelectSelector.Foreground(warnColour)
+	t.Focused.SelectedOption = t.Focused.SelectedOption.Foreground(successColour)
+	t.Focused.SelectedPrefix = t.Focused.SelectedPrefix.Foreground(successColour)
+	t.Focused.UnselectedOption = t.Focused.UnselectedOption.Foreground(foreground)
+	t.Focused.UnselectedPrefix = t.Focused.UnselectedPrefix.Foreground(secondaryColour)
+	t.Focused.FocusedButton = t.Focused.FocusedButton.Foreground(successColour).Background(secondaryColour).Bold(true)
+	t.Focused.BlurredButton = t.Focused.BlurredButton.Foreground(foreground).Background(background)
+
+	t.Focused.TextInput.Cursor = t.Focused.TextInput.Cursor.Foreground(tertiaryColour)
+	t.Focused.TextInput.Placeholder = t.Focused.TextInput.Placeholder.Foreground(secondaryColour)
+	t.Focused.TextInput.Prompt = t.Focused.TextInput.Prompt.Foreground(tertiaryColour)
+
+	t.Blurred = t.Focused
+	t.Blurred.Base = t.Blurred.Base.BorderStyle(lipgloss.HiddenBorder())
+	t.Blurred.NextIndicator = lipgloss.NewStyle()
+	t.Blurred.PrevIndicator = lipgloss.NewStyle()
+
+	return t
+}

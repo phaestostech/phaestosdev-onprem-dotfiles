@@ -1,0 +1,183 @@
+# OpenSpec shell completions configuration
+fpath=("$HOME/.oh-my-zsh/custom/completions" $fpath)
+autoload -Uz compinit
+compinit
+
+# Path to your Oh My Zsh installation.
+export ZSH="$HOME/.oh-my-zsh"
+
+ZSH_THEME="robbyrussell"
+
+plugins=(
+    colored-man-pages
+    dotenv
+    git
+    zsh-autosuggestions
+    zsh-interactive-cd
+    zsh-syntax-highlighting
+)
+
+source $ZSH/oh-my-zsh.sh
+
+##############################################################################
+############################## BEGIN ZSH CUSTOM ##############################
+##############################################################################
+
+# fzf
+source <(fzf --zsh)
+
+# zsh-bd
+source $HOME/.zsh/plugins/bd/bd.zsh
+
+# Search Backwards Re-binding
+bindkey "^R" history-incremental-pattern-search-backward
+bindkey '^[[1;5D' backward-word
+bindkey '^[[1;5C' forward-word
+
+############################################################################
+############################## END ZSH CUSTOM ##############################
+############################################################################
+
+#############################################################################
+############################## BEGIN FUNCTIONS ##############################
+#############################################################################
+
+func checkSSHTunnels() { lsof -i -n | egrep 'ssh' }
+func checkSSHDTunnelts() { lsof -i -n | egrep 'sshd' }
+func killMySQLTunnel() { sudo kill $(lsof -t -i :3306) }
+func whereami() { printf '%s\n' "${PWD##*/}" }
+func whichAccount() { aws sts get-caller-identity --profile default | jq '.' }
+func destroyTfState() { terraform state rm $(terraform state list | tr '\n' ' ') }
+func cleanUpTfState() { terraform state rm $(tfsl | tr '\n' ' ') }
+func dockerPsPretty() { docker ps --format 'table {{ `{{.ID}}` }}\t{{ `{{.Names}}` }}\t{{ `{{.Image}}` }}\t{{ `{{.Status}}` }}\t{{ `{{.Command}}` }}\t{{ `{{.RunningFor}}` }}' }
+func dockerContainerLsPretty() { docker container ls -a --format 'table {{ `{{.ID}}` }}\t{{ `{{.Names}}` }}\t{{ `{{.Image}}` }}\t{{ `{{.Status}}` }}\t{{ `{{.RunningFor}}` }}' }
+func dotEnv() { export $(egrep -v '^#' .env | xargs) }
+func dotEnvLocal() { export $(egrep -v '^#' .env.local | xargs) }
+func checkovHere() { checkov --config-file ~/Developments/devops-buildkite-quality-gates/config/.checkov.terraform.yml -d ./ }
+func findTerragruntCache() { find . -type d -name ".terragrunt-cache" }
+func deleteTerragruntCache() { find . -type d -name ".terragrunt-cache" -prune -exec rm -rf {} \; }
+func checkDirSize() { du -sh *; }
+func argocdPortForward() { kubectl port-forward svc/argocd-server -n argocd 8080:443 }
+func shrug() { echo '¯\_(ツ)_/¯' }
+func showTerminalColours() { for i in {0..255}; do print -Pn "%K{$i}  %k%F{$i}${(l:3::0:)i}%f " ${${(M)$((i%6)):#3}:+$'\n'}; done }
+
+# Top-N largest directories (summarised) at a given depth
+bigdirs() {
+  local dir=${1:-.} n=${2:-20} depth=${3:-1}
+  du -k -d "${depth}" -- "${dir}" 2>/dev/null \
+  | sort -nr \
+  | awk -v n="${n}" '
+  function human(x,   u,i){split("B KB MB GB TB PB",u," ");for(i=1;x>=1024 &&
+  i<length(u);i++)x/=1024;printf "%.1f %s", x, u[i]}
+  NR>1 { printf "%8s  %s\n", human($1*1024), $2; if(++c>=n) exit }'
+}
+
+# Top-N largest files recursively (uses zsh glob ordering)
+bigfiles() {
+  emulate -L zsh -o extendedglob
+  local dir=${1:-.} n=${2:-20}
+  local -a files
+  files=(${dir}/**/*(.DOL[1,${n}]))
+  (( ${#files} )) && ls -lh -- "${files[@]}"
+}
+
+#############################################################################
+############################### END FUNCTIONS ###############################
+#############################################################################
+
+##########################################################################
+############################## BEGIN CUSTOM ##############################
+##########################################################################
+
+export HISTFILE=~/.zsh_history
+export HISTSIZE=9999999999
+export SAVEHIST=$HISTSIZE
+export EDITOR=vim
+export PAGER=less
+
+# mise
+eval "$($HOME/.local/bin/mise activate zsh)"
+eval "$(mise activate zsh)"
+
+## GOLANG
+export GOPATH="$HOME/go"
+export GOPRIVATE='github.com/phaestostech/*'
+
+## RUST
+export PATH="$HOME/.cargo/bin:$PATH"
+
+# bun completions
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
+# linear
+LINEAR_API_KEY={{ onepasswordRead "op://phaestosdev-onprem/Linear API Key/credential" }}
+
+# Atlassian
+export CONFLUENCE_API_KEY={{ onepasswordRead "op://phaestosdev-onprem/Confluence API Key/credential" }}
+
+# Context7
+export CONTEXT7_API_KEY="{{ onepasswordRead "op://phaestosdev-onprem/Context7 API Key/credential" }}"
+
+# Terrastruct D2
+export TSTRUCT_TOKEN="{{ onepasswordRead "op://phaestosdev-onprem/Terrastruct D2 Token/credential" }}"
+
+# Claude Code
+alias ccode="$HOME/.local/bin/claude --ide"
+alias klaude="$HOME/.local/bin/claude --ide"
+alias claude-dangerous="claude --allow-dangerously-skip-permissions"
+
+# Google Cloud Platform
+
+## ALIASES
+
+alias clr='clear '
+alias clrls='clear && ls -al'
+alias lsa='ls -a'
+alias lsl='ls -al'
+
+alias g='git '
+alias h='helm '
+alias n='/usr/local/bin/nexus '
+alias tf='terraform '
+alias tg='terragrunt '
+alias py='python3 '
+alias d='docker'
+alias dco='docker compose'
+alias vsc='code -n '
+alias nv='nvim '
+alias gcp='gcloud '
+
+alias k='kubectl '
+alias ka='kubectl --as=devops '
+alias kctx='kubectx '
+alias kns='kubens '
+alias kx='f() { [ "$1" ] && kubectl config use-context $1 || kubectl config current-context ; } ; f'
+alias kn='f() { [ "$1" ] && kubectl config set-context --current --namespace $1 || kubectl config view --minify | grep namespace | cut -d" " -f6 ; } ; f'
+alias ask-claude='f() { claude -p "$@"}'
+
+export KUBE_EDITOR="vim"
+
+## Suffice Aliases
+alias -s txt=neovim
+alias -s py=pycharm
+alias -s tf=goland
+alias -s terraform=goland
+alias -s tofu=goland
+alias -s json=goland
+alias -s yaml=goland
+alias -s go=goland
+alias -s js=webstorm
+alias -s jsx=webstorm
+alias -s ts=webstorm
+alias -s tsx=webstorm
+
+source ~/.zsh_aliases
+
+# Per-host extras
+{{ if stat (joinPath .chezmoi.homeDir ".zshrc_host") -}}
+source ~/.zshrc_host
+{{ end -}}

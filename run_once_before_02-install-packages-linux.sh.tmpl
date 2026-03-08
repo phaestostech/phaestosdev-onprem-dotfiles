@@ -1,0 +1,36 @@
+#!/bin/bash
+{{ if eq .chezmoi.os "linux" -}}
+sudo apt-get update -qq
+sudo apt-get install -y \
+  curl \
+  git \
+  git-lfs \
+  build-essential \
+  unzip \
+  jq \
+  fzf \
+  ripgrep \
+  htop \
+  neovim \
+  tmux \
+  tree \
+  wget
+
+{{ if not .isServer -}}
+# Workstation apps
+# Google Chrome
+if ! command -v google-chrome-stable &> /dev/null; then
+  wget -q -O /tmp/google-chrome.deb "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb"
+  sudo dpkg -i /tmp/google-chrome.deb || sudo apt-get install -f -y
+  rm -f /tmp/google-chrome.deb
+fi
+
+# Obsidian (via latest .deb from GitHub)
+if ! command -v obsidian &> /dev/null; then
+  OBSIDIAN_VERSION=$(curl -s https://api.github.com/repos/obsidianmd/obsidian-releases/releases/latest | grep -oP '"tag_name": "v\K[^"]+')
+  wget -q -O /tmp/obsidian.deb "https://github.com/obsidianmd/obsidian-releases/releases/download/v${OBSIDIAN_VERSION}/obsidian_${OBSIDIAN_VERSION}_amd64.deb"
+  sudo dpkg -i /tmp/obsidian.deb || sudo apt-get install -f -y
+  rm -f /tmp/obsidian.deb
+fi
+{{ end -}}
+{{ end -}}

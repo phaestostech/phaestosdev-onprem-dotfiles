@@ -1,0 +1,18 @@
+package version
+
+import (
+	"github.com/alecthomas/kong"
+
+	"{{.Module}}/pkg/build"
+)
+
+// VerFlag is a custom flag type that prints version info and exits
+type VerFlag string
+
+func (v VerFlag) Decode(_ *kong.DecodeContext) error { return nil }
+func (v VerFlag) IsBool() bool                       { return true }
+func (v VerFlag) BeforeApply(app *kong.Kong, _ kong.Vars) error {
+	build.PrintBuildInfo()
+	app.Exit(0)
+	return nil
+}

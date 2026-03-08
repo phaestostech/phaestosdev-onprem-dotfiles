@@ -1,0 +1,36 @@
+# Nix
+alias rd='rm -rf '
+alias md='mkdir -p '
+alias cdb='pushd'
+alias cdr='popd'
+alias randomuuid='uuidgen | tr A-F a-f'
+alias cwd='basename "$(pwd)"'
+alias timestamp='date +"%Y%m%dT%H%M%S"'
+alias lesstail='less +G'
+alias bottomless='less +G'
+alias tailf='tail -f'
+
+# Docker
+alias dps='docker ps'
+alias dco='docker compose'
+
+# Python
+alias pyserver='python3 -m http.server'
+alias pyfind='find . -name "*.py"'
+alias pygrep='grep -nr --include="*.py"'
+
+# tofu
+alias tfi='tofu init '
+alias tfws='tofu workspace '
+alias tfwss='tofu workspace select '
+alias tfwsls='tofu workspace ls'
+alias tfwssh='tofu workspace show'
+alias tfo='tofu output'
+alias tfsl='tofu state list'
+alias tfss='tofu state show'
+alias tfsrm='tofu state rm'
+alias tfpo='tofu plan -out=tfplan '
+alias tfap='tofu apply tfplan '
+
+# Annalise Enterprise
+alias et='enterprise-test '

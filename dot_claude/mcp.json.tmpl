@@ -1,0 +1,113 @@
+{
+  "mcpServers": {
+    "atlassian": {
+      "type": "sse",
+      "url": "https://mcp.atlassian.com/v1/sse"
+    },
+    "github": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "$GITHUB_TOKEN"
+      }
+    },
+{{ if .isWork -}}
+    "slack-harrisonai": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "slack-mcp-server@latest", "--transport", "stdio"],
+      "env": {
+        "SLACK_MCP_XOXP_TOKEN": "{{ onepasswordRead "op://phaestosdev-onprem/Slack Harrison.ai User Token/credential" }}",
+        "SLACK_MCP_XOXB_TOKEN": "{{ onepasswordRead "op://phaestosdev-onprem/Slack Harrison.ai Bot Token/credential" }}"
+      }
+    },
+    "slack-annaliseai": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "slack-mcp-server@latest", "--transport", "stdio"],
+      "env": {
+        "SLACK_MCP_XOXP_TOKEN": "{{ onepasswordRead "op://phaestosdev-onprem/Slack Annalise.ai User Token/credential" }}",
+        "SLACK_MCP_XOXB_TOKEN": "{{ onepasswordRead "op://phaestosdev-onprem/Slack Annalise.ai Bot Token/credential" }}"
+      }
+    },
+{{ end -}}
+{{ if not .isServer -}}
+    "obsidian": {
+      "command": "uvx",
+      "args": ["mcp-obsidian"],
+      "env": {
+        "OBSIDIAN_API_KEY": "{{ .obsidianApiKey }}",
+        "OBSIDIAN_HOST": "https://127.0.0.1",
+        "OBSIDIAN_PORT": "27124"
+      }
+    },
+{{ end -}}
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"]
+    },
+    "figma": {
+      "type": "http",
+      "url": "https://mcp.figma.com/mcp",
+      "headers": {}
+    },
+    "linear": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://mcp.linear.app/sse"]
+    },
+{{ if .isWork -}}
+    "aws.cost-explorer": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["awslabs.cost-explorer-mcp-server@latest"],
+      "env": {
+        "AWS_PROFILE": "annalise-master",
+        "AWS_REGION": "us-east-1",
+        "FASTMCP_LOG_LEVEL": "ERROR"
+      }
+    },
+    "aws.billing-cost-management": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["awslabs.billing-cost-management-mcp-server@latest"],
+      "env": {
+        "AWS_PROFILE": "annalise-master",
+        "AWS_REGION": "us-east-1",
+        "FASTMCP_LOG_LEVEL": "ERROR"
+      }
+    },
+    "aws.pricing": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["awslabs.aws-pricing-mcp-server@latest"],
+      "env": {
+        "AWS_PROFILE": "annalise-master",
+        "AWS_REGION": "us-east-1",
+        "FASTMCP_LOG_LEVEL": "ERROR"
+      }
+    },
+    "aws.knowledge": {
+      "type": "http",
+      "url": "https://knowledge-mcp.global.api.aws",
+      "headers": {}
+    },
+{{ end -}}
+    "context7": {
+      "type": "http",
+      "url": "https://mcp.context7.com/mcp",
+      "headers": {
+        "CONTEXT7_API_KEY": "{{ onepasswordRead "op://phaestosdev-onprem/Context7 API Key/credential" }}"
+      }
+    },
+    "wiz": {
+      "type": "http",
+      "url": "https://mcp.app.wiz.io",
+      "headers": {
+        "Wiz-Client-Id": "mizxlhm2v5h5pnjscv3hycud5u3bh2gdpn3fcb5y44ewqbdthi4ws",
+        "Wiz-Client-Secret": "uE3VoF8SnPO6mUjKwAhldafKMS0GPTwEAc6ygiC9IO1KgWdCUYkeH1mQ4FGOU1GU",
+        "Wiz-DataCenter": "ap2"
+      }
+    }
+  }
+}

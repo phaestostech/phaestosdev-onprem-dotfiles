@@ -1,0 +1,26 @@
+package config
+
+import (
+	"github.com/alecthomas/kong"
+
+	"{{.Module}}/pkg/build"
+)
+
+// VerFlag is a custom flag type that prints version info and exits
+type VerFlag string
+
+func (v VerFlag) Decode(_ *kong.DecodeContext) error { return nil }
+func (v VerFlag) IsBool() bool                       { return true }
+func (v VerFlag) BeforeApply(app *kong.Kong, _ kong.Vars) error {
+	build.PrintBuildInfo()
+	app.Exit(0)
+	return nil
+}
+
+// AppCtx holds the global CLI configuration
+type AppCtx struct {
+	Version  VerFlag `help:"Print version information and quit" short:"V" placeholder:"-"`
+	LogLevel string  `short:"l" help:"Log output level" enum:"debug,info,warn,error" env:"LOG_LEVEL" default:"info"`
+	Pretty   bool    `name:"pretty" help:"Pretty print output" default:"true" negatable:""`
+	Debug    bool    `help:"Switch on debug mode" default:"false"`
+}

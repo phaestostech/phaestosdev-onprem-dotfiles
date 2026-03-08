@@ -1,0 +1,13 @@
+package commands
+
+import (
+	"{{.Module}}/internal/config"
+	"{{.Module}}/pkg/build"
+)
+
+type VersionCmd struct{}
+
+func (c *VersionCmd) Run(ctx *config.AppCtx) error {
+	build.PrintBuildInfo()
+	return nil
+}

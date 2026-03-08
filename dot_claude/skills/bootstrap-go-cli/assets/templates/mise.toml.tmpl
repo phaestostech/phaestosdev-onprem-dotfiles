@@ -1,0 +1,93 @@
+[tools]
+go = "{{.GoVersion}}"
+
+# =============================================================================
+# Go CLI Tasks
+# =============================================================================
+
+[tasks.clean]
+description = "Remove build artifacts from bin directory"
+run = "rm -f bin/*"
+
+[tasks.fmt]
+description = "Format Go code using go fmt"
+run = "go fmt ./..."
+
+[tasks.lint]
+description = "Run golangci-lint with 10m timeout"
+run = "golangci-lint run --timeout 10m --verbose ./..."
+
+[tasks.test]
+description = "Run unit tests (short mode, excluding specific packages)"
+run = "go test -short -count=1 `go list ./... | grep -vE '/constants|/types|/testutils|/cli|/version|/build'` -cover"
+
+[tasks."test:integration"]
+description = "Run integration tests with coverage report"
+run = """
+go test -count=1 `go list ./... | grep -vE '/constants|/types|/testutils|/cli|/version|/build'` -coverprofile=coverage.out
+go tool cover -func=coverage.out
+"""
+alias = "it"
+
+[tasks."test:coverage"]
+description = "View test coverage report in browser"
+run = "go tool cover -html=coverage.out"
+
+[tasks.build]
+description = "Build binary for current platform"
+run = """
+BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+GIT_SHA=$(git rev-parse HEAD 2>/dev/null || echo "develop")
+VERSION=$(git branch --show-current 2>/dev/null || echo "develop")
+LDFLAGS="-s -w -X main.Version=${VERSION} -X main.Date=${BUILD_DATE} -X main.Commit=${GIT_SHA}"
+CGO_ENABLED=0 go build -ldflags="${LDFLAGS}" -tags="nomsgpack" -o ./bin/{{.AppName}} {{.MainPath}}
+"""
+
+[tasks.compile]
+description = "Cross-compile binary for multiple platforms"
+run = """
+BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+GIT_SHA=$(git rev-parse HEAD 2>/dev/null || echo "develop")
+VERSION=$(git branch --show-current 2>/dev/null || echo "develop")
+LDFLAGS="-s -w -X main.Version=${VERSION} -X main.Date=${BUILD_DATE} -X main.Commit=${GIT_SHA}"
+TAGS="nomsgpack"
+
+GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags="${LDFLAGS}" -tags="${TAGS}" -o ./bin/{{.AppName}}-linux-amd64 {{.MainPath}}
+GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build -ldflags="${LDFLAGS}" -tags="${TAGS}" -o ./bin/{{.AppName}}-linux-arm64 {{.MainPath}}
+GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 go build -ldflags="${LDFLAGS}" -tags="${TAGS}" -o ./bin/{{.AppName}}-darwin-amd64 {{.MainPath}}
+GOOS=darwin GOARCH=arm64 CGO_ENABLED=0 go build -ldflags="${LDFLAGS}" -tags="${TAGS}" -o ./bin/{{.AppName}}-darwin-arm64 {{.MainPath}}
+"""
+
+[tasks.run]
+description = "Run CLI with --help flag"
+run = """
+BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+GIT_SHA=$(git rev-parse HEAD 2>/dev/null || echo "develop")
+VERSION=$(git branch --show-current 2>/dev/null || echo "develop")
+LDFLAGS="-s -w -X main.Version=${VERSION} -X main.Date=${BUILD_DATE} -X main.Commit=${GIT_SHA}"
+go run -ldflags="${LDFLAGS}" -tags="nomsgpack" {{.MainPath}} --help
+"""
+
+[tasks."run:version"]
+description = "Run CLI version command"
+run = """
+BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+GIT_SHA=$(git rev-parse HEAD 2>/dev/null || echo "develop")
+VERSION=$(git branch --show-current 2>/dev/null || echo "develop")
+LDFLAGS="-s -w -X main.Version=${VERSION} -X main.Date=${BUILD_DATE} -X main.Commit=${GIT_SHA}"
+go run -ldflags="${LDFLAGS}" -tags="nomsgpack" {{.MainPath}} version
+"""
+
+[tasks.install]
+description = "Install binary to GOPATH/bin"
+run = """
+BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+GIT_SHA=$(git rev-parse HEAD 2>/dev/null || echo "develop")
+VERSION=$(git branch --show-current 2>/dev/null || echo "develop")
+LDFLAGS="-s -w -X main.Version=${VERSION} -X main.Date=${BUILD_DATE} -X main.Commit=${GIT_SHA}"
+CGO_ENABLED=0 go install -ldflags="${LDFLAGS}" -tags="nomsgpack" {{.MainPath}}
+"""
+
+[tasks.all]
+description = "Clean, lint, and build"
+depends = ["clean", "lint", "build"]

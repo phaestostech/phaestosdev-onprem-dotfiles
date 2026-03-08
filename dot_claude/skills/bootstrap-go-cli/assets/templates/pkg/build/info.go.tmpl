@@ -1,0 +1,92 @@
+package build
+
+import (
+	"fmt"
+	"runtime"
+	"strings"
+	"time"
+
+	"github.com/samber/lo"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
+
+	"{{.Module}}/internal/constants"
+	"{{.Module}}/pkg/cli"
+)
+
+var buildInfo = &Info{
+	Status:        "ok",
+	ServerName:    constants.AppName,
+	ClientVersion: fmt.Sprintf("%s/%s (https://%s)", constants.AppName, constants.Module, "develop"),
+	Commit:        "HEAD",
+	BuildDate:     time.Now().Format(time.RFC3339),
+	Platform:      fmt.Sprintf("%s/%s", runtime.GOOS, runtime.GOARCH),
+	GoVersion:     runtime.Version(),
+	Module:        constants.Module,
+}
+
+type Info struct {
+	Status        string `json:"status"`
+	ServerName    string `json:"name"`
+	ServerVersion string `json:"serverVersion"`
+	ClientVersion string `json:"clientVersion"`
+	Commit        string `json:"commit"`
+	BuildDate     string `json:"buildDate"`
+	GoVersion     string `json:"goVersion"`
+	Platform      string `json:"platform"`
+	Module        string `json:"module"`
+	Environment   string `json:"environment"`
+}
+
+func SetBuildInfo(version, commit, date, env string) *Info {
+	buildInfo.ServerVersion = version
+	if date != "" {
+		buildInfo.BuildDate = date
+	}
+	if commit != "" && len(commit) > 6 {
+		buildInfo.Commit = commit
+	}
+	buildInfo.Environment = env
+	if env == "" {
+		buildInfo.Environment = "unknown"
+	}
+	buildInfo.ClientVersion = fmt.Sprintf("%s/%s (https://%s)", constants.AppName, constants.Module, version)
+	return buildInfo
+}
+
+func SetEnv(env string) {
+	buildInfo.Environment = env
+}
+
+func GetBuildInfo() *Info {
+	return buildInfo
+}
+
+func PrintBuildInfo() {
+	name := strings.Join(lo.Map(strings.Split(buildInfo.ServerName, "-"), func(item string, _ int) string {
+		return cases.Title(language.English).String(item)
+	}), " ")
+
+	commit := buildInfo.Commit
+	if commit != "" && len(commit) > 6 {
+		commit = commit[:6]
+	}
+
+	cli.SecondaryColour.Printf("%s\n\n", name)
+
+	cli.PrimaryColour.Printf("Server version:  ")
+	cli.SecondaryColour.Println(buildInfo.ServerVersion)
+
+	cli.PrimaryColour.Printf("commit:          ")
+	cli.SecondaryColour.Println(commit)
+
+	cli.PrimaryColour.Printf("buildDate:       ")
+	cli.SecondaryColour.Println(buildInfo.BuildDate)
+
+	cli.PrimaryColour.Printf("goVersion:       ")
+	cli.SecondaryColour.Println(buildInfo.GoVersion)
+
+	cli.PrimaryColour.Printf("platform:        ")
+	cli.SecondaryColour.Println(buildInfo.Platform)
+	fmt.Println()
+}

@@ -1,0 +1,34 @@
+Host phaestosdev-ubuntu-1
+  HostName 100.99.66.38
+  User phaestos-admin
+  Port 22
+  IdentityFile ~/.ssh/id_ed25519
+
+Host phaestosdev-ubuntu-2
+  HostName 100.75.139.32
+  User phaestos-admin
+  Port 22
+  IdentityFile ~/.ssh/id_ed25519
+
+{{ if not .isServer -}}
+Host CN55-Macbook-Pro13
+  HostName 100.102.14.34
+  User codeninja
+  Port 22
+  IdentityFile ~/.ssh/id_ed25519
+{{ end -}}
+
+{{ if .isWork -}}
+Host HAI-GM72X000TY
+  HostName 100.97.195.27
+  User Andru.Che@annalise.ai
+  Port 22
+  IdentityFile ~/.ssh/id_ed25519
+{{ end -}}
+
+Host *
+  AddKeysToAgent yes
+  IdentityFile ~/.ssh/id_ed25519
+{{ if eq .chezmoi.os "darwin" -}}
+  UseKeychain yes
+{{ end -}}

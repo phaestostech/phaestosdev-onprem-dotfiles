@@ -1,0 +1,42 @@
+[user]
+  email = {{ .email }}
+  name = {{ .name }}
+  signingkey = {{ output "cat" (joinPath .chezmoi.homeDir ".ssh/id_ed25519.pub") | trim }}
+[init]
+  defaultBranch = main
+[core]
+  autocrlf = input
+[push]
+  autoSetupRemote = true
+[commit]
+  gpgsign = true
+[gpg]
+  format = ssh
+[gpg "ssh"]
+  allowedSignersFile = {{ .chezmoi.homeDir }}/.ssh/allowed_signers
+[pull]
+  rebase = true
+[filter "lfs"]
+  clean = git-lfs clean -- %f
+  smudge = git-lfs smudge -- %f
+  process = git-lfs filter-process
+  required = true
+[remote "origin"]
+  defaultRemove = true
+[checkout]
+  defaultRemote = origin
+{{ if eq .chezmoi.os "darwin" -}}
+[credential]
+  helper = osxkeychain
+{{ else -}}
+[credential "https://github.com"]
+  helper =
+  helper = !/usr/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+  helper =
+  helper = !/usr/bin/gh auth git-credential
+{{ end -}}
+{{ if .isWork -}}
+[url "git@github.com:annaliseai"]
+  insteadOf = https://github.com/annaliseai
+{{ end -}}

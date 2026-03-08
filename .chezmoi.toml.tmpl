@@ -1,0 +1,22 @@
+{{- $name := promptStringOnce . "name" "Full name" "Andru Manual-Che" -}}
+{{- $email := promptStringOnce . "email" "Email address" "andru@phaestos.tech" -}}
+{{- $isWork := promptBoolOnce . "isWork" "Is this a work machine" false -}}
+{{- $isServer := promptBoolOnce . "isServer" "Is this a server (not a workstation)" false -}}
+{{- $obsidianApiKey := "" -}}
+{{- if not $isServer -}}
+{{-   $obsidianApiKey = promptStringOnce . "obsidianApiKey" "Obsidian Local REST API key (from the plugin)" "" -}}
+{{- end -}}
+
+[data]
+  name = {{ $name | quote }}
+  email = {{ $email | quote }}
+  isWork = {{ $isWork }}
+  isServer = {{ $isServer }}
+  obsidianApiKey = {{ $obsidianApiKey | quote }}
+
+[onepassword]
+  command = "op"
+
+[git]
+  autoCommit = false
+  autoPush = false

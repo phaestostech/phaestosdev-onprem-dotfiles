@@ -1,0 +1,61 @@
+package cli
+
+import (
+	"os"
+
+	"github.com/alecthomas/kong"
+	"go.uber.org/zap"
+
+	"{{.Module}}/internal/commands"
+	"{{.Module}}/internal/config"
+	"{{.Module}}/internal/constants"
+	"{{.Module}}/pkg/build"
+	"{{.Module}}/pkg/logger"
+)
+
+var (
+	app struct {
+		config.AppCtx
+		Version commands.VersionCmd `cmd:"" name:"version" help:"Print version information"`
+		// Add more commands here
+	}
+)
+
+// Run is the entrypoint for the CLI
+func Run(version, commit, date string) error {
+	// Initialize logger before anything else
+	log := logger.Init(false) // Set to true for JSON output
+	defer func() { _ = log.Sync() }()
+
+	// Set build info
+	build.SetBuildInfo(version, commit, date, "")
+
+	cfg, kongCtx := ParseArgs(version, commit, date)
+
+	// Update logger based on config
+	if cfg.Debug {
+		log = logger.Init(false)
+		zap.ReplaceGlobals(log)
+	}
+
+	return kongCtx.Run(cfg)
+}
+
+func ParseArgs(ver, commit, date string) (*config.AppCtx, *kong.Context) {
+	ctx := kong.Parse(&app,
+		kong.Name(constants.AppName),
+		kong.Description(constants.AppDescription),
+		kong.Bind(),
+		kong.UsageOnError(),
+		kong.ConfigureHelp(kong.HelpOptions{Compact: false, Summary: false}),
+		kong.Vars{
+			"name":    constants.AppName,
+			"version": ver,
+			"commit":  commit,
+			"date":    date,
+			"repo":    constants.Module,
+		},
+	)
+
+	return &app.AppCtx, ctx
+}

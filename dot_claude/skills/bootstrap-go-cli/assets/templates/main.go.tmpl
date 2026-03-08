@@ -1,0 +1,21 @@
+package main
+
+import (
+	"fmt"
+	"os"
+
+	"{{.Module}}/internal/cli"
+)
+
+var (
+	Version = "develop"
+	Commit  = ""
+	Date    = ""
+)
+
+func main() {
+	if err := cli.Run(Version, Commit, Date); err != nil {
+		_, _ = fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+}

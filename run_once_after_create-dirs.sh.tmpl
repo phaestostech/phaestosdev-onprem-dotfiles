@@ -1,0 +1,9 @@
+#!/bin/bash
+# Create standard directory structure
+mkdir -p "$HOME/phaestostech"
+mkdir -p "$HOME/.local/bin"
+
+{{ if .isWork -}}
+mkdir -p "$HOME/harrison-ai"
+mkdir -p "$HOME/annaliseai"
+{{ end -}}

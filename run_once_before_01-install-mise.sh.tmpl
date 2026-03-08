@@ -1,0 +1,12 @@
+#!/bin/bash
+# Install mise if not already installed, then install tools
+if ! command -v mise &> /dev/null; then
+  {{ if eq .chezmoi.os "darwin" -}}
+  brew install mise
+  {{ else -}}
+  curl https://mise.run | sh
+  {{ end -}}
+fi
+
+export PATH="$HOME/.local/bin:$PATH"
+mise install
