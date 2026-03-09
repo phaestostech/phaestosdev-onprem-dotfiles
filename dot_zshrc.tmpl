@@ -126,55 +126,13 @@ export CONTEXT7_API_KEY="{{ onepasswordRead "op://phaestosdev-onprem/Context7 AP
 export TSTRUCT_TOKEN="{{ onepasswordRead "op://phaestosdev-onprem/Terrastruct D2 Token/credential" }}"
 
 # Claude Code
-alias ccode="$HOME/.local/bin/claude --ide"
-alias klaude="$HOME/.local/bin/claude --ide"
 alias claude-dangerous="claude --allow-dangerously-skip-permissions"
 
 # Google Cloud Platform
 
-## ALIASES
-
-alias clr='clear '
-alias clrls='clear && ls -al'
-alias lsa='ls -a'
-alias lsl='ls -al'
-
-alias g='git '
-alias h='helm '
-alias n='/usr/local/bin/nexus '
-alias tf='terraform '
-alias tg='terragrunt '
-alias py='python3 '
-alias d='docker'
-alias dco='docker compose'
-alias vsc='code -n '
-alias nv='nvim '
-alias gcp='gcloud '
-
-alias k='kubectl '
-alias ka='kubectl --as=devops '
-alias kctx='kubectx '
-alias kns='kubens '
-alias kx='f() { [ "$1" ] && kubectl config use-context $1 || kubectl config current-context ; } ; f'
-alias kn='f() { [ "$1" ] && kubectl config set-context --current --namespace $1 || kubectl config view --minify | grep namespace | cut -d" " -f6 ; } ; f'
-alias ask-claude='f() { claude -p "$@"}'
-
 export KUBE_EDITOR="vim"
 
-## Suffice Aliases
-alias -s txt=neovim
-alias -s py=pycharm
-alias -s tf=goland
-alias -s terraform=goland
-alias -s tofu=goland
-alias -s json=goland
-alias -s yaml=goland
-alias -s go=goland
-alias -s js=webstorm
-alias -s jsx=webstorm
-alias -s ts=webstorm
-alias -s tsx=webstorm
-
+# Aliases
 source ~/.zsh_aliases
 
 # Per-host extras
