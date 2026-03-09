@@ -1,15 +1,3 @@
-Host phaestosdev-ubuntu-1
-  HostName 100.99.66.38
-  User phaestos-admin
-  Port 22
-  IdentityFile ~/.ssh/id_ed25519
-
-Host phaestosdev-ubuntu-2
-  HostName 100.75.139.32
-  User phaestos-admin
-  Port 22
-  IdentityFile ~/.ssh/id_ed25519
-
 {{ if not .isServer -}}
 Host CN55-Macbook-Pro13
   HostName 100.102.14.34
